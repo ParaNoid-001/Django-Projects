@@ -1,0 +1,4 @@
+-- Use validation
+-- remove required field warning
+-- by deafult disable the add task button when the user input the all data the add task button should be visible
+-- use calender future/past date validation.

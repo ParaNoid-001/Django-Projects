@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Report</title>
+</head>
+<body>
+    <h1>Task Report</h1>
+    <table border="1">
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+        </tr>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.status }}</td>
+            <td>{{ task.due_date }}</td>
+            <td>{{ task.priority }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'task_list' %}">Back to List</a>
+</body>
+</html>

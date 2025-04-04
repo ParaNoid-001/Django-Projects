@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(45deg, #008080, #20B2AA);
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .task-container {
+            max-width: 10000px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        table {
+            background: #fff;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #008080;
+            color: white;
+        }
+
+        tbody tr:hover {
+            background: rgba(32, 178, 170, 0.3);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+
+<body>
+    <h2 class="mt-4">📌 Task Management</h2>
+
+    <div class="task-container">
+        <button onclick="window.location.href='/'" class="btn btn-dark w-100 mb-3">⬅ Back to Home</button>
+
+        <div id="task-list">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="task-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            function fetchTasks() {
+                $.ajax({
+                    url: "{% url 'get_tasks' %}",
+                    type: "GET",
+                    success: function(response) {
+                        $("#task-table-body").empty();
+                        response.tasks.forEach(function(task) {
+                            var doneButton = task.status !== "Done" 
+                                ? `<button class="done-task btn btn-danger btn-sm" data-task-id="${task.id}">✔ Mark as Done</button>` 
+                                : `<span class="badge bg-success">✔ Done</span>`;
+
+                            $("#task-table-body").append(`
+                                <tr id="task-${task.id}">
+                                    <td>${task.title}</td>
+                                    <td>${task.description}</td>
+                                    <td><span id="status-${task.id}" class="badge bg-warning">${task.status}</span></td>
+                                    <td>${task.due_date}</td>
+                                    <td>${task.priority}</td>
+                                    <td>
+                                        <a href="/edit/${task.id}/" class="btn btn-primary btn-sm">✏ Edit</a>
+                                        ${doneButton}
+                                        <button class="delete-task btn btn-danger btn-sm" data-task-id="${task.id}">🗑 Delete</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                });
+            }
+
+            fetchTasks();
+
+            $(document).on("click", ".done-task", function() {
+                var taskId = $(this).data("task-id");
+                $.ajax({
+                    type: "GET",
+                    url: "/done/" + taskId + "/",
+                    success: function(response) {
+                        $("#status-" + response.task_id).text(response.new_status).removeClass('bg-warning').addClass('bg-success');
+                        $("#task-" + response.task_id + " .done-task").replaceWith('<span class="badge bg-success">✔ Done</span>');
+                    }
+                });
+            });
+
+            $(document).on("click", ".delete-task", function() {
+                var taskId = $(this).data("task-id");
+                $.ajax({
+                    type: "GET",
+                    url: "/delete/" + taskId + "/",
+                    success: function() {
+                        fetchTasks();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
