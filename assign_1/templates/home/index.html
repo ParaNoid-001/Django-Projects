@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uppercase Converter</title>
+</head>
+<style>
+  table, th, td{
+      border: 2px solid rgb(125, 232, 253);
+  }
+  body{
+      background-color: rgb(120, 238, 41);
+  }
+</style>
+<body>
+<div class="container" style="padding: 200px;">
+    <h1>Convert Lowercase to Uppercase</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="text" rows="4" cols="50" placeholder="Enter your text here..."></textarea><br><br>
+        <input type="submit" value="Convert">
+    </form>
+
+    {% if uppercase_text %}
+        <h2>Converted Uppercase Text:</h2>
+        <p>{{ uppercase_text }}</p>
+    {% endif %}
+</div>
+</body>
+</html>
