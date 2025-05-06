@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5" style="padding-bottom: 100px;">
+    <!-- Success/Error Messages -->
+    {% if messages %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %}-fill"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="bi bi-plus-circle"></i> {{ page }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="recipeName" class="form-label">Recipe Name *</label>
+                            <input type="text" class="form-control" id="recipeName" name="recipe_name" 
+                                   value="{{ request.POST.recipe_name|default:'' }}"
+                                   placeholder="Enter recipe name (letters only)" 
+                                   pattern="[A-Za-z\s]+" 
+                                   title="Only letters and spaces allowed" required>
+                            <div class="invalid-feedback">
+                                Please provide a valid recipe name (only letters and spaces)
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recipeDescription" class="form-label">Recipe Description *</label>
+                            <textarea class="form-control" id="recipeDescription" name="recipe_description" 
+                                      rows="4" placeholder="Enter detailed recipe description" required>{{ request.POST.recipe_description|default:'' }}</textarea>
+                            <div class="invalid-feedback">
+                                Please provide a recipe description
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="recipeImage" class="form-label">Recipe Image *</label>
+                            <input class="form-control" type="file" id="recipeImage" name="recipe_image"
+                                   accept="image/jpeg, image/png" required>
+                            <div class="form-text">Accepted formats: JPEG, PNG (Max 5MB)</div>
+                            <div class="invalid-feedback">
+                                Please upload an image (JPEG or PNG)
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end border-top pt-3">
+                            <a href="{% url 'vege:recipes' %}" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="reset" class="btn btn-outline-danger me-2">
+                                <i class="bi bi-x-circle"></i> Clear Form
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-send-check"></i> Submit Recipe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Client-side validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form.needs-validation');
+    if (!form) return;
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
+    
+    // Additional validation for recipe name
+    const recipeName = document.getElementById('recipeName');
+    if (recipeName) {
+        recipeName.addEventListener('input', function() {
+            if (/^[A-Za-z\s]+$/.test(this.value)) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

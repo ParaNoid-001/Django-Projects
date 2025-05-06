@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <!-- Deletion Confirmation Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteModalLabel">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Confirm Account Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">This action cannot be undone!</h5>
+                            <p>By deleting your account:</p>
+                            <ul>
+                                <li>All your data will be permanently removed</li>
+                                <li>Active subscriptions will be canceled</li>
+                                <li>All your content will be deleted</li>
+                            </ul>
+                        </div>
+                        <form method="post" id="deleteForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Enter your password to confirm:</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <button class="btn btn-outline-secondary toggle-password" type="button">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                                <label class="form-check-label" for="confirmDelete">
+                                    I understand this will permanently delete my account
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </button>
+                        <button type="submit" form="deleteForm" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i> Permanently Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Card -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-5 text-center">
+                <h2 class="fw-bold mb-4">Delete Your Account</h2>
+                <p class="text-danger mb-4">
+                    <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                </p>
+                <p class="lead mb-4">This action will permanently remove your account and all associated data.</p>
+                
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash-fill"></i> Delete Account
+                </button>
+                
+                <a href="{% url 'accounts:profile' %}" class="btn btn-secondary ms-2">
+                    <i class="bi bi-arrow-left"></i> Back to Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const icon = this.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+            } else {
+                input.type = "password";
+                icon.classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
+            }
+        });
+    });
+
+    // Form validation before submission
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmCheck = document.getElementById('confirmDelete').checked;
+            
+            if (!password || !confirmCheck) {
+                e.preventDefault();
+                alert('Please enter your password and confirm deletion');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h1 class="h4 mb-0">Contact Us</h1>
+        </div>
+        <div class="card-body">
+          <p class="lead">We'd love to hear from you! Fill out the form below and we'll get back to you as soon as possible.</p>
+          
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            {% if messages %}
+              <div class="mb-4">
+                {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            
+            <div class="mb-4">
+              <label for="name" class="form-label fw-bold">Full Name</label>
+              <input name="name" type="text" class="form-control form-control-lg" id="name" placeholder="Your name" required>
+              <div class="invalid-feedback">
+                Please provide your name.
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="email" class="form-label fw-bold">Email Address</label>
+              <input name="email" type="email" class="form-control form-control-lg" id="email" placeholder="your.email@example.com" required>
+              <div class="invalid-feedback">
+                Please provide a valid email address.
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="subject" class="form-label fw-bold">Subject</label>
+              <select name="subject" class="form-select form-select-lg" id="subject">
+                <option value="" selected disabled>Select a subject</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Support">Support</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Partnership">Partnership</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div class="mb-4">
+              <label for="message" class="form-label fw-bold">Message</label>
+              <textarea name="message" class="form-control form-control-lg" id="message" rows="5" placeholder="Your message here..." required></textarea>
+              <div class="invalid-feedback">
+                Please enter your message.
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button type="reset" class="btn btn-outline-secondary btn-lg me-md-2">
+                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+              </button>
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-send-fill me-2"></i>Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="card-footer bg-light">
+          <div class="row">
+            <div class="col-md-6">
+              <h3 class="h5">Other Ways to Reach Us</h3>
+              <ul class="list-unstyled">
+                <li class="mb-2"><i class="bi bi-envelope-fill text-primary me-2"></i> contact@example.com</li>
+                <li class="mb-2"><i class="bi bi-telephone-fill text-primary me-2"></i> +1 (555) 123-4567</li>
+                <li><i class="bi bi-geo-alt-fill text-primary me-2"></i> 123 Main St, City, Country</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h3 class="h5">Business Hours</h3>
+              <ul class="list-unstyled">
+                <li class="mb-2">Monday - Friday: 9:00 AM - 5:00 PM</li>
+                <li>Saturday: 10:00 AM - 2:00 PM</li>
+
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Client-side form validation
+(function () {
+  'use strict'
+  
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+  
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1>Contact Us</h1>
+  <p>Feel free to drop us a line:</p>
+  <form method="post" class="p-4 border rounded bg-light">
+    {% csrf_token %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input name="name" type="text" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input name="email" type="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Message</label>
+      <textarea name="message" class="form-control" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Message</button>
+  </form>
+
+  <hr class="my-5">
+</div>
+{% endblock %}

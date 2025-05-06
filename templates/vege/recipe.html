@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+<!-- {% load static %} -->
+{% block content %}
+
+<div class="container-fluid px-4 py-5" style="max-width: 1600px;">
+    <!-- Floating Notifications -->
+    {% if messages %}
+    <div class="toast-container position-fixed top-3 end-3" style="z-index: 1100;">
+        {% for message in messages %}
+        <div class="toast show align-items-center text-white bg-{% if message.tags == 'error' %}danger{% else %}success{% endif %}-subtle border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center">
+                    <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %}-fill me-3 fs-5"></i>
+                    <span class="me-3">{{ message }}</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Hero Section with Carousel -->
+    <div id="recipeCarousel" class="carousel slide mb-5 rounded-4 overflow-hidden shadow-lg" data-bs-ride="carousel" style="height: 400px;">
+        <div class="carousel-indicators">
+            {% for recipe in featured_recipes %}
+            <button type="button" data-bs-target="#recipeCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+            {% endfor %}
+        </div>
+        <div class="carousel-inner h-100">
+            {% for recipe in featured_recipes %}
+            <div class="carousel-item h-100 {% if forloop.first %}active{% endif %}">
+                <div class="position-relative h-100">
+                    <img src="{{ recipe.Recipe_image.url }}" class="d-block w-100 h-100 object-cover" alt="{{ recipe.Recipe_name }}" style="filter: brightness(0.7);">
+                    <div class="carousel-caption d-flex flex-column justify-content-center h-100" style="bottom: auto; padding: 0 10%;">
+                        <h2 class="display-5 fw-bold text-white mb-3">{{ recipe.Recipe_name }}</h2>
+                        <p class="lead text-white-80 mb-4">{{ recipe.Recipe_description|truncatechars:120 }}</p>
+                        <div class="d-flex gap-3 justify-content-center">
+                            <a href="{% url 'vege:recipe_detail' recipe.id %}" class="btn btn-light btn-lg px-4 py-2 rounded-pill">View Recipe</a>
+                            <a href="{% url 'vege:recipe_gallery' %}" class="btn btn-outline-light btn-lg px-4 py-2 rounded-pill">Browse All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#recipeCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#recipeCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container px-4 py-5">
+        <!-- Recently Added Section -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-light mb-1" style="color: #2d3436;">Recently Added Recipes</h2>
+                    <p class="text-muted mb-0">Discover your latest culinary creations</p>
+                </div>
+                <a href="{% url 'vege:recipe_gallery' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-grid me-2"></i>View All
+                </a>
+            </div>
+
+            {% if recipes %}
+            <div class="row g-4">
+                {% for recipe in recipes %}
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm overflow-hidden" style="border-radius: 12px; transition: all 0.3s ease;">
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            <img src="{{ recipe.Recipe_image.url }}" class="card-img-top h-100 w-100 object-cover" alt="{{ recipe.Recipe_name }}" style="transition: transform 0.8s ease;">
+                            <div class="card-img-overlay d-flex flex-column justify-content-end p-0">
+                                <div class="bg-dark-gradient w-100 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+                                    <h5 class="card-title text-white mb-1">{{ recipe.Recipe_name }}</h5>
+                                    <p class="card-text text-white-80 small mb-2">{{ recipe.Recipe_description|truncatechars:60 }}</p>
+                                </div>
+                            </div>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-success bg-opacity-90 text-white rounded-pill">New</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'vege:recipe_detail' recipe.id %}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                    View <i class="bi bi-arrow-right-short ms-1"></i>
+                                </a>
+                                <div class="text-muted small">
+                                    <i class="bi bi-clock me-1"></i> {{ recipe.created_at|timesince }} ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 px-3 bg-light rounded-4">
+                <i class="bi bi-journal-text display-4 text-muted mb-4"></i>
+                <h3 class="text-dark mb-3">Your recipe book is empty</h3>
+                <p class="text-muted mb-4">Start by adding your first delicious recipe to share with others</p>
+                {% if perms.vege.can_add_recipe %}
+                <a href="{% url 'vege:add_recipe' %}" class="btn btn-success px-4 py-2 rounded-pill">
+                    <i class="bi bi-plus-lg me-2"></i> Add Recipe
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Categories Section -->
+        <div class="mb-5">
+            <h3 class="fw-light mb-4" style="color: #2d3436;">Browse by Category</h3>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <a href="#" class="card category-card text-decoration-none border-0 overflow-hidden shadow-sm" style="height: 150px; border-radius: 12px;">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100 object-cover" alt="Breakfast">
+                        <div class="card-img-overlay d-flex align-items-end p-3 bg-dark-gradient">
+                            <h5 class="text-white mb-0">Breakfast</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="card category-card text-decoration-none border-0 overflow-hidden shadow-sm" style="height: 150px; border-radius: 12px;">
+                        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100 object-cover" alt="Lunch">
+                        <div class="card-img-overlay d-flex align-items-end p-3 bg-dark-gradient">
+                            <h5 class="text-white mb-0">Lunch</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="card category-card text-decoration-none border-0 overflow-hidden shadow-sm" style="height: 150px; border-radius: 12px;">
+                        <img src="https://images.unsplash.com/photo-1426869981800-95ebf51ce900?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100 object-cover" alt="Dinner">
+                        <div class="card-img-overlay d-flex align-items-end p-3 bg-dark-gradient">
+                            <h5 class="text-white mb-0">Dinner</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="card category-card text-decoration-none border-0 overflow-hidden shadow-sm" style="height: 150px; border-radius: 12px;">
+                        <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100 object-cover" alt="Desserts">
+                        <div class="card-img-overlay d-flex align-items-end p-3 bg-dark-gradient">
+                            <h5 class="text-white mb-0">Desserts</h5>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Modal -->
+<div class="modal fade" id="newsletterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-6 d-none d-md-block">
+                        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid h-100 object-cover" alt="Newsletter">
+                    </div>
+                    <div class="col-md-6 p-5">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="text-center mb-4">
+                            <i class="bi bi-envelope-open display-4 text-success"></i>
+                            <h3 class="mt-3 mb-2">Stay Updated</h3>
+                            <p class="text-muted">Subscribe to our newsletter for new recipes</p>
+                        </div>
+                        <form>
+                            <div class="mb-3">
+                                <input type="email" class="form-control py-3" placeholder="Your email address" style="border-radius: 8px;">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 py-3" style="border-radius: 8px;">
+                                Subscribe
+                            </button>
+                        </form>
+                        <p class="small text-muted text-center mt-3">We'll never share your email with anyone else.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modern styling enhancements */
+    :root {
+        --primary-color: #00b894;
+        --primary-hover: #00a884;
+        --text-dark: #2d3436;
+        --text-muted: #636e72;
+        --bg-light: #f5f6fa;
+    }
+    
+    body {
+        background-color: var(--bg-light);
+        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    
+    .carousel-item {
+        transition: transform 1s ease-in-out;
+    }
+    
+    .carousel-caption {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .card {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .card:hover {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+        transform: translateY(-5px);
+    }
+    
+    .card:hover .card-img {
+        transform: scale(1.1);
+    }
+    
+    .category-card:hover {
+        transform: translateY(-5px) scale(1.02);
+    }
+    
+    .bg-dark-gradient {
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    }
+    
+    .object-cover {
+        object-fit: cover;
+    }
+    
+    .btn-success {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+    
+    .toast {
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        background-color: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #b2bec3;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #636e72;
+    }
+    
+    /* Animation classes */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+</style>
+
+<!-- <script>
+    // Initialize carousel with autoplay
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-rotate carousel every 5 seconds
+        const myCarousel = document.getElementById('recipeCarousel');
+        const carousel = new bootstrap.Carousel(myCarousel, {
+            interval: 5000,
+            ride: 'carousel'
+        });
+        
+        // Add animation to cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.classList.add('animate-fade-in');
+            card.classList.add(`delay-${index % 4 + 1}`);
+        });
+        
+        // Show newsletter modal after 3 seconds
+        setTimeout(() => {
+            const newsletterModal = new bootstrap.Modal(document.getElementById('newsletterModal'));
+            newsletterModal.show();
+        }, 3000);
+        
+        // Add parallax effect to carousel
+        window.addEventListener('scroll', function() {
+            const carousel = document.getElementById('recipeCarousel');
+            const scrollPosition = window.pageYOffset;
+            carousel.style.transform = `translateY(${scrollPosition * 0.2}px)`;
+        });
+    });
+</script> -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/recipe.js' %}"></script>
+{% endblock %}
