@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="account-management-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="account-management-header">
+                    <h2><i class="bi bi-gear-fill"></i> Account Management</h2>
+                    <p>Manage your account settings</p>
+                </div>
+                
+                <div class="account-options-grid">
+                    <a href="{% url 'accounts:edit_profile' %}" class="account-option-card">
+                        <div class="option-icon">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h3>Edit Profile</h3>
+                        <p>Update your personal information and profile picture</p>
+                    </a>
+                    
+                    <a href="{% url 'accounts:password_change' %}" class="account-option-card">
+                        <div class="option-icon">
+                            <i class="bi bi-lock-fill"></i>
+                        </div>
+                        <h3>Change Password</h3>
+                        <p>Update your account password</p>
+                    </a>
+                    
+                    <a href="{% url 'accounts:delete_account' %}" class="account-option-card">
+                        <div class="option-icon">
+                            <i class="bi bi-trash-fill"></i>
+                        </div>
+                        <h3>Delete Account</h3>
+                        <p>Permanently delete your account</p>
+                    </a>
+                </div>
+                
+                <div class="back-to-profile">
+                    <a href="{% url 'accounts:profile' %}" class="back-btn">
+                        <i class="bi bi-arrow-left"></i> Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .account-management-container {
+        padding: 4rem 0;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+    
+    .account-management-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .account-management-header h2 {
+        font-size: 2rem;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .account-management-header p {
+        color: #718096;
+        font-size: 1.1rem;
+    }
+    
+    .account-options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .account-option-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .account-option-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .option-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.8rem;
+    }
+    
+    .account-option-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: #2d3748;
+    }
+    
+    .account-option-card p {
+        color: #718096;
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+    
+    .back-to-profile {
+        text-align: center;
+    }
+    
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        color: #6e8efb;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        color: #a777e3;
+    }
+    
+    .back-btn i {
+        margin-right: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .account-options-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .account-management-header h2 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}

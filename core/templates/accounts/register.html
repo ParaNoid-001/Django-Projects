@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head_title %}Sign Up{% endblock %}
+{% block content %}
+
+<!-- Registration Form -->
+<div class="row justify-content-center my-5">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card border-0 shadow-lg overflow-hidden">
+            <div class="row g-0">
+                <!-- Left Side - Visual Appeal -->
+                <div class="col-md-5 d-none d-md-block bg-gradient-primary">
+                    <div class="h-100 d-flex flex-column justify-content-center p-4 text-white">
+                        <h2 class="fw-bold mb-4">Join Our Community</h2>
+                        <p class="mb-4">Create your account to unlock exclusive features and connect with others.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2"></i> Personalized experience
+                            </li>
+                            <li class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2"></i> Connect with like-minded people
+                            </li>
+                            <li class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2"></i> Access exclusive content
+                            </li>
+                        </ul>
+                        <div class="mt-auto"> 
+                            <img src="{% static 'images/signup-illustration.svg' %}" alt="Sign up illustration" class="img-fluid" style="max-height: 200px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side - Form -->
+                <div class="col-md-7">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-gradient-primary">Create Your Account</h2>
+                            <p class="text-muted">Fill in your details to get started</p>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Display form errors if any -->
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>Error:</strong> Please correct the following:
+                                    <ul class="mb-0">
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                            <!-- Profile Picture Upload -->
+                            <div class="mb-4 text-center">
+                                <div class="avatar-upload mx-auto">
+                                    <div class="avatar-edit">
+                                        <input type='file' id="id_profile_pic" name="profile_pic" accept=".png, .jpg, .jpeg" />
+                                        <label for="id_profile_pic" class="btn btn-sm btn-primary rounded-circle">
+                                            <i class="bi bi-camera-fill"></i>
+                                        </label>
+                                    </div>
+                                    <div class="avatar-preview">
+                                        <div id="imagePreview" style="background-image: url('/static/images/default-background.jpg');"></div>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Upload a profile picture (optional)</small>
+                            </div>
+
+                            <!-- Basic Information -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input name="first_name" type="text" class="form-control" id="first_name" required>
+                                    <div class="invalid-feedback">
+                                        Please provide your first name.
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input name="last_name" type="text" class="form-control" id="last_name" required>
+                                    <div class="invalid-feedback">
+                                        Please provide your last name.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Account Information -->
+                            <div class="mb-4">
+                                <label for="username" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">@</span>
+                                    <input name="username" type="text" class="form-control" id="username" required>
+                                </div>
+                                <small class="text-muted">This will be your unique identifier on our platform.</small>
+                                <div class="invalid-feedback">
+                                    Please choose a username.
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input name="email" type="email" class="form-control" id="email" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+
+                            <!-- Personal Details -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="birthdate" class="form-label">Birthdate</label>
+                                    <input name="birthdate" type="date" class="form-control" id="birthdate">
+                                    <small class="text-muted">We'll use this to celebrate your special day!</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input name="location" type="text" class="form-control" id="location" placeholder="City, Country">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea name="bio" class="form-control" id="bio" rows="2" placeholder="Tell us a bit about yourself"></textarea>
+                                <small class="text-muted">Max 200 characters</small>
+                            </div>
+
+                            <!-- Password Section -->
+                            <div class="mb-4">
+                                <label for="password1" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input name="password1" type="password" class="form-control" id="password1" required>
+                                    <button class="btn btn-outline-secondary toggle-password" type="button">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength mt-2">
+                                    <div class="progress" style="height: 5px;">
+                                        <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="form-text">
+                                        <ul class="list-unstyled">
+                                            <li><span id="length" class="text-muted"><i class="bi bi-circle"></i> At least 8 characters</span></li>
+                                            <li><span id="letter" class="text-muted"><i class="bi bi-circle"></i> Contains a letter</span></li>
+                                            <li><span id="number" class="text-muted"><i class="bi bi-circle"></i> Contains a number</span></li>
+                                            <li><span id="special" class="text-muted"><i class="bi bi-circle"></i> Contains a special character</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password2" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <input name="password2" type="password" class="form-control" id="password2" required>
+                                    <button class="btn btn-outline-secondary toggle-password" type="button">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                                <div id="password-match-feedback" class="invalid-feedback">
+                                    Passwords must match.
+                                </div>
+                            </div>
+
+                            <!-- Terms and Submit -->
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label" for="terms">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                                <div class="invalid-feedback">
+                                    You must agree before submitting.
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-3 mb-3 fw-bold">
+                                <i class="bi bi-person-plus-fill me-2"></i> Create Account
+                            </button>
+                            
+                            <div class="text-center">
+                                <p class="mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="fw-bold">Sign In</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title" id="termsModalLabel">Terms of Service</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>1. Acceptance of Terms</h5>
+                <p>By accessing or using our services, you agree to be bound by these terms...</p>
+                
+                <h5 class="mt-4">2. User Responsibilities</h5>
+                <p>You are responsible for maintaining the confidentiality of your account...</p>
+                
+                <h5 class="mt-4">3. Content Guidelines</h5>
+                <p>You agree not to post content that is illegal, harmful, threatening, abusive...</p>
+                
+                <h5 class="mt-4">4. Privacy Policy</h5>
+                <p>Your privacy is important to us. Please review our Privacy Policy to understand...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .text-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+                background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    
+    .avatar-upload {
+        position: relative;
+        max-width: 120px;
+    }
+    
+    .avatar-upload .avatar-edit {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+    
+    .avatar-upload .avatar-edit input {
+        display: none;
+    }
+    
+    .avatar-upload .avatar-edit label {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 0;
+        border-radius: 100%;
+        background: #FFFFFF;
+        border: 1px solid transparent;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        font-weight: normal;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .avatar-upload .avatar-edit label:hover {
+        background: #f1f1f1;
+        border-color: #d6d6d6;
+    }
+    
+    .avatar-upload .avatar-preview {
+        width: 120px;
+        height: 120px;
+        position: relative;
+        border-radius: 100%;
+        border: 4px solid #F8F8F8;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    }
+    
+    .avatar-upload .avatar-preview > div {
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    
+    .password-strength .progress {
+        background-color: #e9ecef;
+    }
+    
+    .password-strength .progress-bar {
+        transition: width 0.3s ease;
+    }
+
+    .img-fluid {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+    .btn-close-white {
+        filter: invert(1);
+    }
+
+    .avatar-upload .avatar-edit label i {
+        color: #000;
+    }
+
+    .avatar-upload .avatar-preview > div {
+        background-image: url('/static/images/default-background.jpg');
+    }
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Profile picture preview
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').style.backgroundImage = 'url(' + e.target.result + ')';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    document.getElementById("id_profile_pic").addEventListener('change', function() {
+        readURL(this);
+    });
+
+    // Password strength meter
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const length = document.getElementById('length');
+    const letter = document.getElementById('letter');
+    const number = document.getElementById('number');
+    const special = document.getElementById('special');
+    
+    password1.addEventListener('input', function() {
+        const value = password1.value;
+        let strength = 0;
+        
+        // Validate length
+        if (value.length >= 8) {
+            strength += 25;
+            length.classList.remove('text-muted');
+            length.classList.add('text-success');
+            length.querySelector('i').className = 'bi bi-check-circle-fill text-success me-1';
+        } else {
+            length.classList.remove('text-success');
+            length.classList.add('text-muted');
+            length.querySelector('i').className = 'bi bi-circle text-muted me-1';
+        }
+        
+        // Validate letters
+        if (/[A-Za-z]/.test(value)) {
+            strength += 25;
+            letter.classList.remove('text-muted');
+            letter.classList.add('text-success');
+            letter.querySelector('i').className = 'bi bi-check-circle-fill text-success me-1';
+        } else {
+            letter.classList.remove('text-success');
+            letter.classList.add('text-muted');
+            letter.querySelector('i').className = 'bi bi-circle text-muted me-1';
+        }
+        
+        // Validate numbers
+        if (/\d/.test(value)) {
+            strength += 25;
+            number.classList.remove('text-muted');
+            number.classList.add('text-success');
+            number.querySelector('i').className = 'bi bi-check-circle-fill text-success me-1';
+        } else {
+            number.classList.remove('text-success');
+            number.classList.add('text-muted');
+            number.querySelector('i').className = 'bi bi-circle text-muted me-1';
+        }
+
+        // Validate special characters
+        if (/[^A-Za-z0-9]/.test(value)) {
+            strength += 25;
+            special.classList.remove('text-muted');
+            special.classList.add('text-success');
+            special.querySelector('i').className = 'bi bi-check-circle-fill text-success me-1';
+        } else {
+            special.classList.remove('text-success');
+            special.classList.add('text-muted');
+            special.querySelector('i').className = 'bi bi-circle text-muted me-1';
+        }
+        
+        // Update strength bar
+        strengthBar.style.width = strength + '%';
+        
+        // Update color based on strength
+        if (strength < 50) {
+            strengthBar.className = 'progress-bar bg-danger';
+        } else if (strength < 75) {
+            strengthBar.className = 'progress-bar bg-warning';
+        } else {
+            strengthBar.className = 'progress-bar bg-success';
+        }
+    });
+    
+    // Confirm password matching
+    password2.addEventListener('input', function() {
+        if (password2.value !== password1.value) {
+            password2.classList.add('is-invalid');
+            document.getElementById('password-match-feedback').style.display = 'block';
+        } else {
+            password2.classList.remove('is-invalid');
+            document.getElementById('password-match-feedback').style.display = 'none';
+        }
+    });
+
+    // Toggle password visibility
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye-fill');
+                icon.classList.add('bi-eye-slash-fill');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash-fill');
+                icon.classList.add('bi-eye-fill');
+            }
+        });
+    });
+    
+    // Form validation
+    (function () {
+        'use strict'
+        
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+});
+</script>
+{% endblock %}
