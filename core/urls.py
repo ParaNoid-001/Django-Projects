@@ -12,10 +12,9 @@ urlpatterns = [
     path('', include(('home.urls', 'home'), namespace='home')), # Include home app URLs
     path('', include('vege.urls', namespace='vege')),
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),  # Include accounts app URLs under /accounts/
-    #path('accounts/', include('accounts.urls', namespace='accounts')),  # Include all accounts app URLs under /accounts/
-    #path('recipes/', include('vege.urls', namespace='vege')),  # Include all vege app URLs under /recipes/
+    path('cart/', include('cart.urls', namespace='cart')),
     
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Add media URL serving correctly
 if settings.DEBUG:
