@@ -1,0 +1,230 @@
+{% extends 'employees/base.html' %}
+
+{% block content %}
+    <h1 class="mb-4">Employee Payroll Management System</h1>
+    
+    <div id="loadingSpinner" class="text-center my-3" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="alert alert-info" role="alert">
+        <strong>Welcome to the Employee Payroll Management System!</strong>
+        This system allows you to manage employee records, designations, and salaries efficiently.
+    </div>
+    <p class="lead">Manage employee records, designations, and salaries efficiently.</p>
+    <p class="text-muted">Use the form below to add new employees and manage existing records.</p>
+
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Add New Employee</h5>
+        </div>
+        <div class="card-body">
+            {% include 'employees/includes/employee_form.html' with form_id="addEmployeeForm" button_text="Add Employee" %}
+        </div>
+    </div>
+    
+
+    <div class="alert alert-info" role="alert">
+        <strong>Note:</strong> You can filter employees by designation using the dropdown above.
+    </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Employee Records</h5>
+            <div class="col-md-3">
+                <select class="form-select" id="designationFilter">
+                    <option value="">All Designations</option>
+                    <option value="Junior Designer">Junior Designer</option>
+                    <option value="Senior Designer">Senior Designer</option>
+                    <option value="Designer">Designer</option>
+                    <option value="Developer">Developer</option>
+                    <option value="Junior Developer">Junior Developer</option>
+                    <option value="Senior Developer">Senior Developer</option>
+                    <option value="QA Engineer">QA Engineer</option>
+                    <option value="Tester">Tester</option>
+                    <option value="Junior Manager">Junior Manager</option>
+                    <option value="Senior Manager">Senior Manager</option>
+                    <option value="Manager">Manager</option>
+
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="employeeTableContainer">
+                {% include 'employees/includes/employee_table.html' %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Edit -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="editEmployeeModalBody">
+                    <!-- Form will be loaded here via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Show loading spinner for AJAX requests
+    $(document).ajaxStart(function() {
+        $('#loadingSpinner').show();
+    }).ajaxStop(function() {
+        $('#loadingSpinner').hide();
+    });
+
+    // Load employees on page load and when filter changes
+    function loadEmployees() {
+        const designation = $('#designationFilter').val();
+        $.get('{% url "get_employees" %}', {designation: designation}, function(data) {
+            $('#employeeTableContainer').html(data.employees_html);
+        });
+    }
+    
+    // Initial load
+    loadEmployees();
+    
+    // Filter change event
+    $('#designationFilter').change(loadEmployees);
+    
+    // Add employee form submission
+    $('#addEmployeeForm').submit(function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        
+        $.ajax({
+            url: '/api/employees/',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                loadEmployees();
+                $('#addEmployeeForm')[0].reset();
+                alert('Employee added successfully!');
+            },
+            error: function(xhr) {
+                const errors = xhr.responseJSON;
+                let errorMessage = 'Error adding employee:\n';
+                for (const field in errors) {
+                    errorMessage += `${field}: ${errors[field].join(', ')}\n`;
+                }
+                alert(errorMessage);
+            }
+        });
+    });
+    
+    // Delete employee
+    $(document).on('click', '.delete-employee', function() {
+        if (confirm('Are you sure you want to delete this employee?')) {
+            const employeeId = $(this).data('id');
+            
+            $.ajax({
+                url: `/api/employees/${employeeId}/`,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                success: function() {
+                    loadEmployees();
+                    alert('Employee deleted successfully!');
+                },
+                error: function() {
+                    alert('Error deleting employee');
+                }
+            });
+        }
+    });
+    
+    // Load edit form
+    $(document).on('click', '.edit-employee', function() {
+        const employeeId = $(this).data('id');
+        
+        $.get(`/api/employees/${employeeId}/`, function(data) {
+            const formHtml = `
+                <form id="editEmployeeForm">
+                    <input type="hidden" name="id" value="${data.id}">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" value="${data.name}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Employee ID</label>
+                        <input type="text" class="form-control" name="employee_id" value="${data.employee_id}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Designation</label>
+                        <select class="form-select" name="designation" required>
+                            <option value="Junior Designer" ${data.designation === 'Junior Designer' ? 'selected' : ''}>Junior Designer</option>
+                            <option value="Senior Designer" ${data.designation === 'Senior Designer' ? 'selected' : ''}>Senior Designer</option>
+                            <option value="Junior Developer" ${data.designation === 'Junior Developer' ? 'selected' : ''}>Junior Developer</option>
+                            <option value="Senior Developer" ${data.designation === 'Senior Developer' ? 'selected' : ''}>Senior Developer</option>
+                            <option value="QA Engineer" ${data.designation === 'QA Engineer' ? 'selected' : ''}>QA Engineer</option>
+                            <option value="Junior Manager" ${data.designation === 'Junior Manager' ? 'selected' : ''}>Junior Manager</option>
+                            <option value="Senior Manager" ${data.designation === 'Senior Manager' ? 'selected' : ''}>Senior Manager</option>
+                            <option value="Designer" ${data.designation === 'Designer' ? 'selected' : ''}>Designer</option>
+                            <option value="Developer" ${data.designation === 'Developer' ? 'selected' : ''}>Developer</option>
+                            <option value="Tester" ${data.designation === 'Tester' ? 'selected' : ''}>Tester</option>
+                            <option value="Manager" ${data.designation === 'Manager' ? 'selected' : ''}>Manager</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Monthly Salary</label>
+                        <input type="number" step="0.01" class="form-control" name="Monthly_salary" value="${data.Monthly_salary}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            `;
+            
+            $('#editEmployeeModalBody').html(formHtml);
+            $('#editEmployeeModal').modal('show');
+        });
+    });
+    
+    // Edit form submission
+    $(document).on('submit', '#editEmployeeForm', function(e) {
+        e.preventDefault();
+        const employeeId = $(this).find('input[name="id"]').val();
+        const formData = $(this).serialize();
+        
+        $.ajax({
+            url: `/api/employees/${employeeId}/`,
+            type: 'PUT',
+            data: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            success: function(response) {
+                loadEmployees();
+                $('#editEmployeeModal').modal('hide');
+                alert('Employee updated successfully!');
+            },
+            error: function(xhr) {
+                const errors = xhr.responseJSON;
+                let errorMessage = 'Error updating employee:\n';
+                for (const field in errors) {
+                    errorMessage += `${field}: ${errors[field].join(', ')}\n`;
+                }
+                alert(errorMessage);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+<form id="{{ form_id }}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Employee ID</label>
+        <input type="text" class="form-control" name="employee_id" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Designation</label>
+        <select class="form-select" name="designation" required>
+            <option value="">Select Designation</option>
+            <option value="Junior Designer">Junior Designer</option>
+            <option value="Designer">Designer</option>
+            <option value="Senior Designer">Senior Designer</option>
+            
+            <option value="Junior Developer">Junior Developer</option>
+            <option value="Developer">Developer</option>
+            <option value="Senior Developer">Senior Developer</option>
+            <option value="Tester">Tester</option>
+            <option value="QA Engineer">QA Engineer</option>
+            <option value="Junior Manager">Junior Manager</option>
+            <option value="Manager">Manager</option>
+            <option value="Senior Manager">Senior Manager</option>
+        </select>
+    </div>
+    <div class="mb-3">
+    <label class="form-label">Monthly Salary</label>
+    <input type="number" step="0.01" class="form-control" name="Monthly_salary" required>
+</div>
+    <button type="submit" class="btn btn-primary">{{ button_text }}</button>
+</form>

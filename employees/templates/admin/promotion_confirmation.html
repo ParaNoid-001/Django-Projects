@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <h2>Promote {{ employees|length }} Employee(s)</h2>
+    <div style="margin: 20px 0;">
+        <label for="new_designation">New Designation:</label>
+        <select name="new_designation">
+            {% for value, label in designation_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div style="margin: 20px 0;">
+        <label for="salary_increase">Salary Increase Amount:</label>
+        <input type="number" name="salary_increase" value="0" min="0" step="500">
+    </div>
+    <input type="hidden" name="apply" value="1">
+    <input type="submit" value="Confirm Promotion">
+    <a href="." style="margin-left: 20px;">Cancel</a>
+</form>
+{% endblock %}

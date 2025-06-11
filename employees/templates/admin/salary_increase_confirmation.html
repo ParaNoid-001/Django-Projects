@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <h2>Apply Salary Increase to {{ employees|length }} Employee(s)</h2>
+    <div style="margin: 20px 0;">
+        <label for="percentage">Increase Percentage:</label>
+        <input type="number" name="percentage" value="10" step="0.1" min="0"> %
+    </div>
+    <input type="hidden" name="apply" value="1">
+    <input type="submit" value="Confirm Increase">
+    <a href="." style="margin-left: 20px;">Cancel</a>
+</form>
+{% endblock %}

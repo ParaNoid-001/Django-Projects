@@ -1,0 +1,38 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Employee ID</th>
+            <th>Designation</th>
+            <th>Monthly Salary</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for employee in employees %}
+        <tr>
+            <td>{{ employee.id }}</td>
+            <td>{{ employee.name }}</td>
+            <td>{{ employee.employee_id }}</td>
+            <td>{{ employee.designation }}</td>
+            <td>₹{{ employee.Monthly_salary }}</td>
+            <td>
+                <button class="btn btn-sm btn-primary edit-employee" data-id="{{ employee.id }}">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-danger delete-employee" data-id="{{ employee.id }}">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-people display-6"></i><br>
+                No employees found
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
